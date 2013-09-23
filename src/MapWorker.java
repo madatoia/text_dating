@@ -39,6 +39,11 @@ public class MapWorker extends Thread{
 					read.substring(0, len-2);
 				else if(read.endsWith("s"))
 					read.substring(0, len-1);
+				else if(read.endsWith("er"))
+					read.substring(0, len-2);
+				else if(read.endsWith("est"))
+					read.substring(0, len-1);
+			
 				
 				aux.word = read;
 				i = mj.words.indexOf(aux);

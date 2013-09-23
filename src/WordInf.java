@@ -76,9 +76,21 @@ class WordInf implements Comparable{
 							break;
 						}
 						
-						if(yearData[i] > peek)	//detrmine peek
-							peek = yearData[i];
+						//if(yearData[i] > peek)	//detrmine peek
+						//	peek = yearData[i];
 					}
+					peek = apparitions;
+					if(word.charAt(0)>= 'A' && word.charAt(0)<= 'Z')
+						peek *= 10;
+					if(word.length() <= 3)
+						peek *= 0.1; //it is highly probabile this word is a preposition
+				/*	if(start < 200)
+						peek *= 8;
+					else if(start < 300)
+						peek *= 4;
+					else if(start < 400)
+						peek *= 2;
+				*/	
 					intervalList.add(new Interval(start, stop, peek));
 					Main.inputFileInfo.adIntervalSimple(new Interval(start, stop, peek));
 					

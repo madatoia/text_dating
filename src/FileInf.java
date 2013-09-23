@@ -35,12 +35,12 @@ public class FileInf {
 	
 	public synchronized void adIntervalSimple(Interval interv){
 		for(int i = interv.start; i <= interv.stop; i++)
-			finalResutsSimple[i]++;
+			finalResutsSimple[i] += interv.peek;
 	}
 	
 	public synchronized void adIntervalGauss(Interval interv){
 		for(int i = interv.start; i <= interv.stop; i++)
-			finalResutsGauss[i]++;
+			finalResutsGauss[i] += interv.peek;
 	}
 	
 	public void computePossibleResult(){
