@@ -116,7 +116,7 @@ public class Incerc {
 						
 						try {
 							DataBaseConnection.insertValuesIntoTable("words", attr, values, true);
-							Thread.sleep(100);
+							//Thread.sleep(100);
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
