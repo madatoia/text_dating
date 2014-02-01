@@ -1,7 +1,10 @@
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -36,30 +39,33 @@ public class Incerc {
 							"D:\\laptop vechi\\androidWorkspace\\TextDating\\googlebooks-eng-all-1gram-20120701-"
 									+ lit));
 			System.out.println("am deschis " + lit);
-			
+
 			while (l.hasNextLine()) {
 				line = l.nextLine();
 				String[] splited = line.split("\\t");
 				cuv = splited[0];
-				//aici parsez cuvantul
-				//daca gasesc caractere diferite de litere, nu il mai iau in considerare
+				// aici parsez cuvantul
+				// daca gasesc caractere diferite de litere, nu il mai iau in
+				// considerare
 				boolean ok = true;
-				for(int j = 0; j < cuv.length(); j++){
-					if(cuv.charAt(j) < 'A' && cuv.charAt(j) != '_'){
+				for (int j = 0; j < cuv.length(); j++) {
+					if (cuv.charAt(j) < 'A' && cuv.charAt(j) != '_') {
 						ok = false;
 						break;
-					} else if(cuv.charAt(j) > 'Z' && cuv.charAt(j) < 'a' && cuv.charAt(j) != '_'){
+					} else if (cuv.charAt(j) > 'Z' && cuv.charAt(j) < 'a'
+							&& cuv.charAt(j) != '_') {
 						ok = false;
 						break;
-					} else if(cuv.charAt(j) > 'z' && cuv.charAt(j) != '_'){
+					} else if (cuv.charAt(j) > 'z' && cuv.charAt(j) != '_') {
 						ok = false;
 						break;
 					}
 				}
-				if(splited.length > 2 && ok){
+				if (splited.length > 2 && ok) {
 					an = Integer.parseInt(splited[1]);
 					if (an >= 1500) {
-					//	writer.write(cuv + " " + an + "\n", 0, (cuv.length() + 6));
+						// writer.write(cuv + " " + an + "\n", 0, (cuv.length()
+						// + 6));
 						aparitiiPeAni[an - 1500] += Long.parseLong(splited[2]); // numar
 																				// toate
 																				// aparitiile
@@ -68,10 +74,20 @@ public class Incerc {
 			}
 			l.close();
 		}
-		
+
 		writer.close();
-		
-		//columns to insert in database
+		BufferedWriter totalApFile = new BufferedWriter(new PrintWriter(
+				new File("aparitii.txt")));
+		try {
+			for (int i = 0; i < aparitiiPeAni.length; i++) {
+				totalApFile.write(i + "/t" + aparitiiPeAni[i] + "\n");
+
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// columns to insert in database
 		ArrayList<String> attr = new ArrayList<String>();
 		attr.add("word");
 		attr.add("year_ap");
@@ -85,38 +101,43 @@ public class Incerc {
 							"D:\\laptop vechi\\androidWorkspace\\TextDating\\googlebooks-eng-all-1gram-20120701-"
 									+ lit));
 			System.out.println("am deschis " + lit);
-					
+
 			while (l.hasNextLine()) {
 				line = l.nextLine();
 				String[] splited = line.split("\\t");
 				cuv = splited[0];
-				//aici parsez cuvantul
-				//daca gasesc caractere diferite de litere, nu il mai iau in considerare
+				// aici parsez cuvantul
+				// daca gasesc caractere diferite de litere, nu il mai iau in
+				// considerare
 				boolean ok = true;
-				for(int j = 0; j < cuv.length(); j++){
-					if(cuv.charAt(j) < 'A'  && cuv.charAt(j) != '.'){
+				for (int j = 0; j < cuv.length(); j++) {
+					if (cuv.charAt(j) < 'A' && cuv.charAt(j) != '.') {
 						ok = false;
 						break;
-					} else if(cuv.charAt(j) > 'Z' && cuv.charAt(j) < 'a' && cuv.charAt(j) != '_'){
+					} else if (cuv.charAt(j) > 'Z' && cuv.charAt(j) < 'a'
+							&& cuv.charAt(j) != '_') {
 						ok = false;
 						break;
-					} else if(cuv.charAt(j) > 'z'){
+					} else if (cuv.charAt(j) > 'z') {
 						ok = false;
 						break;
 					}
 				}
-				if(splited.length > 2 && ok){
+				if (splited.length > 2 && ok) {
 					an = Integer.parseInt(splited[1]);
 					if (an >= 1500) {
-						long nrAp = Long.parseLong(splited[2]); 
+						long nrAp = Long.parseLong(splited[2]);
 						values.clear();
 						values.add(cuv);
-						values.add(""+an);
-						values.add(""+ number_format.format(+nrAp*100000.0/aparitiiPeAni[an-1500]));
-						
+						values.add("" + an);
+						values.add(""
+								+ number_format.format(+nrAp * 10000.0
+										/ aparitiiPeAni[an - 1500]));
+
 						try {
-							DataBaseConnection.insertValuesIntoTable("words", attr, values, true);
-							//Thread.sleep(100);
+							DataBaseConnection.insertValuesIntoTable("words",
+									attr, values, true);
+							// Thread.sleep(100);
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -125,7 +146,7 @@ public class Incerc {
 				}
 			}
 			l.close();
-			//writer.close();
+			// writer.close();
 		}
 	}
 }
