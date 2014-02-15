@@ -1,6 +1,8 @@
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.UnknownHostException;
@@ -8,6 +10,7 @@ import java.text.DecimalFormat;
 import java.util.Scanner;
 import java.util.Set;
 
+import com.mongodb.DBCursor;
 import com.mongodb.MongoClient;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -42,11 +45,11 @@ public class Main {
 		int an;
 		long[] aparitiiPeAni = new long[510];
 
-		PrintWriter writer = new PrintWriter(System.out);
+		//PrintWriter writer = new PrintWriter(System.out);
 		// writer.println(inputFileInfo);
 		// writer.close();*/
 
-		for (int i = 0; i < 26; i++) {
+		/*for (int i = 0; i < 26; i++) {
 			lit = (char) ('a' + i);
 			try {
 				l = new Scanner(
@@ -98,25 +101,42 @@ public class Main {
 			}
 
 		}
-
-		writer.close();
-		BufferedWriter totalApFile;
+	*/
+		//BufferedReader totalApFile;
 		try {
-			totalApFile = new BufferedWriter(new PrintWriter(new File(
-					"aparitii.txt")));
+			/*totalApFile = new BufferedReader(new FileReader(new File(
+					"aparitii.txt")));*/
 
-			for (int i = 0; i < aparitiiPeAni.length; i++) {
+			/*for (int i = 0; i < aparitiiPeAni.length; i++) {
 				totalApFile.write(i + "\t" + aparitiiPeAni[i] + "\n");
 
+			}*/
+			Scanner s = new Scanner(new File("aparitii.txt"));
+			while(s.hasNextInt()){
+				an = s.nextInt();
+				System.out.println(an);
+				aparitiiPeAni[an] = s.nextLong();
 			}
-			totalApFile.close();
+			s.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		// columns to insert in database
-		String prevWord = "";
+		//String prevWord = "";
 		BasicDBObject toInsert = new BasicDBObject();
+		/*toInsert.append("word", "cuv");
+		String ins = "[[1900, 1]";
+		for(int i=0; i<500; i++){
+			ins += ", [1999, "+i+"]";
+		}
+		toInsert.append("aparitii", ins+"]");
+		col.insert(toInsert);
+		DBCursor cr = col.find();
+		while(cr.hasNext()){
+			System.out.println(cr.next());
+		}*/
 		DecimalFormat number_format = new DecimalFormat("##.#########");
 		for (int i = 0; i < 26; i++) {
 			lit = (char) ('a' + i);
@@ -126,7 +146,7 @@ public class Main {
 								"D:\\laptop vechi\\androidWorkspace\\TextDating\\googlebooks-eng-all-1gram-20120701-"
 										+ lit));
 				System.out.println("am deschis " + lit);
-
+				//String apparitions = "";
 				while (l.hasNextLine()) {
 					line = l.nextLine();
 					String[] splited = line.split("\\t");
@@ -135,59 +155,40 @@ public class Main {
 					// daca gasesc caractere diferite de litere, nu il mai iau
 					// in
 					// considerare
-					if (cuv.equals(prevWord)) {
+				
+					boolean ok = true;
+
+					for (int j = 0; j < cuv.length(); j++) {
+						if (cuv.charAt(j) < 'A'
+								&& cuv.charAt(j) != '.') {
+							ok = false;
+							break;
+						} else if (cuv.charAt(j) > 'Z'
+								&& cuv.charAt(j) < 'a'
+								&& cuv.charAt(j) != '_') {
+							ok = false;
+							break;
+						} else if (cuv.charAt(j) > 'z') {
+							ok = false;
+							break;
+						}
+					}
+					if ( ok ) {
+						toInsert.append("word", cuv);
 						if (splited.length > 2) {
 							an = Integer.parseInt(splited[1]);
 							if (an >= 1500) {
-								long nrAp = Long.parseLong(splited[2]);
-								toInsert.append(
-										"" + an,
-										""
-												+ number_format
-														.format(+nrAp
-																* 10000.0
-																/ aparitiiPeAni[an - 1500]));
-
+								long nrAp = Long
+										.parseLong(splited[2]);
+								toInsert.append("app", "["+ an+", "
+										+ number_format
+										.format(+nrAp
+												* 10000.0
+												/ aparitiiPeAni[an - 1500])+"]");
+								col.insert(toInsert);
 							}
 						}
-					} else {
-						col.insert(toInsert);
 						toInsert.clear();
-						boolean ok = true;
-
-						for (int j = 0; j < cuv.length(); j++) {
-							if (cuv.charAt(j) < 'A'
-									&& cuv.charAt(j) != '.') {
-								ok = false;
-								break;
-							} else if (cuv.charAt(j) > 'Z'
-									&& cuv.charAt(j) < 'a'
-									&& cuv.charAt(j) != '_') {
-								ok = false;
-								break;
-							} else if (cuv.charAt(j) > 'z') {
-								ok = false;
-								break;
-							}
-						}
-						if (ok) {
-							prevWord = cuv;
-							toInsert.append("word", cuv);
-							if (splited.length > 2) {
-								an = Integer.parseInt(splited[1]);
-								if (an >= 1500) {
-									long nrAp = Long
-											.parseLong(splited[2]);
-									toInsert.append(
-											"year:",
-											"["+ an+", "
-													+ number_format
-															.format(+nrAp
-																	* 10000.0
-																	/ aparitiiPeAni[an - 1500])+"]");
-								}
-							}
-						}
 					}
 				}
 				l.close();
@@ -198,5 +199,4 @@ public class Main {
 			}
 		}
 	}
-
 }
